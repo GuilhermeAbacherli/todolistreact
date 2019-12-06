@@ -1,13 +1,11 @@
 import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { withSnackbar } from "notistack";
-import { Card, CardContent, CardActions, CircularProgress } from "@material-ui/core";
+import { Card, CardContent, CardActions } from "@material-ui/core";
 import PersonAddIcon from "@material-ui/icons/PersonAddOutlined";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import api from "../../services/api";
-import { login } from "../../services/auth";
 import Logo from "../../assets/logo512.png";
-// import { green } from '@material-ui/core/colors';
 
 import { Form, Container, StyledInput, StyledButton } from "./styles";
 
@@ -24,57 +22,41 @@ const styles = {
     },
 };
 
-class PLogin extends Component {
+class PRegister extends Component {
     state = {
         username: "",
+        email: "",
         password: "",
 
         errorUsername: false,
         errorPassword: false,
-
-        isLoading: false,
     }
 
-    _handleLogin = event => {
+    _handleRegister = event => {
         event.preventDefault();
-        this.setState({ isLoading: true });
-        const { username, password } = this.state;
+        const { username, email, password } = this.state;
         if (!username) {
-            this.setState({ errorUsername: true, isLoading: false });
+            this.setState({ errorUsername: true });
             this.props.enqueueSnackbar("Por favor insira um nome de usuário", { variant: "error" });
         }
         if (!password) {
-            this.setState({ errorPassword: true, isLoading: false });
+            this.setState({ errorPassword: true });
             this.props.enqueueSnackbar("Por favor insira uma senha", { variant: "error" });
         }
 
         if (username && password) {
-            api.post("/login", { username, password })
+            api.post("/register", { username, email, password })
                 .then(res => {
-                    if (res.data === "User not found.") {
-                        this.setState({ errorUsername: true, isLoading: false });
-                        this.props.enqueueSnackbar("Usuário não encontrado", { variant: "error" });
-                    }
-                    if (res.data === "Invalid password.") {
-                        this.setState({ errorPassword: true, isLoading: false });
-                        this.props.enqueueSnackbar("Senha incorreta", { variant: "error" });
-                    }
-                    if (res.data.token) {
-                        login(res.data.token);
-                        this.props.history.push({
-                            pathname: "/home",
-                            state: {
-                                firstLogin: true,
-                                user: {
-                                    name: username,
-                                },
-                            },
-                        });
+                    if (res.data === "This username already exists.") {
+                        this.setState({ errorUsername: true });
+                        this.props.enqueueSnackbar("Nome de usuário já existente, por favor tente outro", { variant: "error" });
+                    } else {
+                        this.props.enqueueSnackbar("Usuário cadastrado com sucesso!", { variant: "success" });
                     }
                 })
                 .catch(err => {
-                    this.setState({ isLoading: false });
-                    this.props.enqueueSnackbar("Ocorreu um erro ao logar, por favor tente novamente...", { variant: "error" });
+                    console.log(err);
+                    this.props.enqueueSnackbar("Ocorreu um erro ao registrar a conta, por favor tente novamente...", { variant: "error" });
                 })
         }
     }
@@ -94,6 +76,12 @@ class PLogin extends Component {
                                 error={this.state.errorUsername} />
 
                             <StyledInput
+                                type="email" variant="outlined" style={styles.inputs}
+                                onChange={event => this.setState({ email: event.target.value })}
+                                label="Endereço de e-mail"
+                                placeholder="seu@email.com" />
+
+                            <StyledInput
                                 type="password" variant="outlined" style={styles.inputs}
                                 onChange={event => this.setState({ errorPassword: false, password: event.target.value })}
                                 label="Senha"
@@ -102,16 +90,15 @@ class PLogin extends Component {
                         </CardContent>
 
                         <CardActions style={styles.cardActionsContainer}>
-                            <StyledButton variant="outlined" onClick={this._handleLogin} disabled={this.state.isLoading}>
-                                {!this.state.isLoading && <ExitToAppIcon style={{ marginRight: "8px", color: "#999" }} />}
-                                {!this.state.isLoading && "Acessar"}
-                                {this.state.isLoading && <CircularProgress size={24} />}
+                            <StyledButton variant="outlined" onClick={this._handleRegister}>
+                                <PersonAddIcon style={{ color: "#999", marginRight: "8px" }} />
+                                Cadastrar-se
                             </StyledButton>
                             <hr style={styles.cardActions} />
-                            <Link style={styles.cardActions} to="/register">
-                                <PersonAddIcon />
+                            <Link style={styles.cardActions} to="/">
+                                <ExitToAppIcon />
                                 <br />
-                                Cadastrar-se
+                                Acessar
                             </Link>
                         </CardActions>
                     </Card>
@@ -121,4 +108,4 @@ class PLogin extends Component {
     }
 }
 
-export default withRouter(withSnackbar(PLogin));
+export default withRouter(withSnackbar(PRegister));
