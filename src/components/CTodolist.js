@@ -78,17 +78,30 @@ const CTodolist = (props) => {
                 localization={{
                     pagination: {
                         labelDisplayedRows: "{from}-{to} de {count}",
-                        labelRowsSelect: "linhas"
+                        labelRowsSelect: "linhas",
+                        firstTooltip: "Primeira página",
+                        lastTooltip: "Última página",
+                        previousTooltip: "Página anterior",
+                        nextTooltip: "Próxima página",
                     },
                     toolbar: {
                         nRowsSelected: "{0} linha(s) selecionada(s)",
                         searchPlaceholder: "Buscar",
+                        searchTooltip: "Buscar",
                     },
                     header: {
                         actions: "Ações",
                     },
                     body: {
                         emptyDataSourceMessage: "Não há dados para exibir",
+                        addTooltip: "Adicionar",
+                        deleteTooltip: "Excluir",
+                        editTooltip: "Editar",
+                        editRow: {
+                            deleteText: "Tem certeza que deseja excluir esse TODO?",
+                            cancelTooltip: "Cancelar",
+                            saveTooltip: "Salvar",
+                        },
                         filterRow: {
                             filterTooltip: "Filtro",
                         },
